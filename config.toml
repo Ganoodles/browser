@@ -1,0 +1,7 @@
+# basic config
+path = "C:/Users/swapt/Documents/next/b/browser/public/files" # Location of the folder you want to serve
+thumbnailRes = 25 # Percentage of original resolution
+
+[ports]
+web = 3000
+backend = 35685
