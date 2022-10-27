@@ -28,7 +28,7 @@ export default function HomeDirList() {
 
     const { data, error } = useSWR("http://127.0.0.1:8000/api", fetcher);
     
-    if (error) return "An error has occurred.";
+    if (error) return "An error has occurred. Most likely has something to do with backend not running.";
     if (!data) return "";
 
     return (
