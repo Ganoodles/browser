@@ -11,7 +11,6 @@ from pathlib import Path
 import filetype
 import logging
 
-
 class Handler(FileSystemEventHandler):
     @staticmethod
     def on_any_event(event):
