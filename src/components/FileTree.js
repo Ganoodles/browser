@@ -1,6 +1,4 @@
 import Link from 'next/link'
-import { useState } from 'react';
-import Image from 'next/image';
 
 const FileTree = (props)  => {
     const downloadIcon = '/svgs/download.svg'
@@ -10,8 +8,8 @@ const FileTree = (props)  => {
 
     function capitalizeFirstLetter(string) {
         return string.charAt(0).toUpperCase() + string.slice(1);
-
     }
+
     return ( // TODO: Implement custom scrollbar and dont resize div
         <div className='rounded-lg page'>
             <div className='interactive-buttons'>

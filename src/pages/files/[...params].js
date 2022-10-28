@@ -1,11 +1,9 @@
-import Link from 'next/link'
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
+import useSWR from 'swr/immutable'; 
+
 import FileTree from '../../components/FileTree';
 import FileGallery from '../../components/FileGallery';
-import useSWR from 'swr/immutable'; 
-import axios from 'axios'
-import { useState } from 'react';
-import { useEffect } from "react";
 
 export default function HomeDirList() {
     const { asPath, pathname } = useRouter();

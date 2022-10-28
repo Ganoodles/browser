@@ -5,11 +5,10 @@ import os
 from pathlib import Path
 import glob
 import shutil
-import cv2, base64
+import cv2
 import os
 from pathlib import Path
 import filetype
-import logging
 
 class Handler(FileSystemEventHandler):
     @staticmethod
