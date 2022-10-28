@@ -10,6 +10,8 @@ import os
 from pathlib import Path
 import filetype
 
+# TODO: handle filetypes other than videos
+
 class Handler(FileSystemEventHandler):
     @staticmethod
     def on_any_event(event):

@@ -1,7 +1,5 @@
 import os
-from types import FrameType
 import filetype
-from .video import retrieveVideoThumbnail
 import pathlib
 from datetime import datetime
 
@@ -27,13 +25,14 @@ def clusterJson(config):
             fSize = format_bytes(stat.st_size)
             simpleIcon, galleryIcon = None, None
 
-            # screw this I need to do my own file matching
+            # TODO: screw this I need to do my own file matching
+            # TODO: maybe find a better way to do this, switch case?
+            # TODO: return thumbnail path
             if filetype.image_match(f):
                 fType = "image"
                 simpleIcon = "/svgs/image.svg"
                 galleryIcon = "/svgs/gallery/image.svg"
             elif filetype.video_match(f):
-                # needa do some thumbnail path stuff here
                 fType = "video"
                 simpleIcon = "/svgs/video.svg"
                 galleryIcon = "/svgs/gallery/video.svg"
