@@ -5,16 +5,24 @@ import os
 from pathlib import Path
 import glob
 import shutil
-import cv2
 import os
 from pathlib import Path
 import filetype
+from tinytag import TinyTag
+import numpy as np
+import cv2
+import base64
+import io
+import audio_metadata
+from PIL import Image
 
-# TODO: handle filetypes other than videos
+# TODO: handle filetypes other than videos, exe, audio
+# TODO: create function to make thumbnail base folders
 
 class Handler(FileSystemEventHandler):
     @staticmethod
     def on_any_event(event):
+        
         thumbnailDirectory = watchDir.thumbnailDirectory
         fileDir = watchDir.fileDir
         
@@ -25,10 +33,8 @@ class Handler(FileSystemEventHandler):
         thumbLoc = dirLoc + ".webp"
 
         if event.event_type == 'created' or event.event_type == 'modified':
-            print("a")
             if filetype.video_match(event.src_path):
-                print("a")
-                watchDir.FrameCapture(event.src_path, thumbnailDirectory + relpath + "/", 15)
+                watchDir.FrameCapture(event.src_path, thumbnailDirectory + relpath + "/video/", 15)
         elif event.event_type == 'deleted':
             if(os.path.isfile(thumbLoc)):
                 os.remove(thumbLoc) 
@@ -62,13 +68,35 @@ class watchDir:
             vid = cv2.VideoCapture(filePath)
             success, image = vid.read()
             Path(outputPath).mkdir(parents=True, exist_ok=True)
-            _, buf = cv2.imencode(".webp", image, [cv2.IMWRITE_WEBP_QUALITY, 25])
+            _, buf = cv2.imencode(".webp", image, [cv2.IMWRITE_WEBP_QUALITY, self.quality])
             img = cv2.imdecode(buf, 1)
             cv2.imwrite(os.path.join(outputPath, (filename + ".webp")), img)
             return True
         else: 
-            return "Error: Not Video File"
+            return False
 
+
+    def audioCoverCapture(self, filePath, outputPath):
+        try:
+            meta = audio_metadata.load(filePath)
+            cover = meta.pictures[0].data
+            if cover:
+                stream = io.BytesIO(cover)
+                pilImg = Image.open(stream)
+                cvImg = np.array(pilImg) 
+                cvImg = cvImg[:, :, ::-1].copy() 
+
+                _, buf = cv2.imencode(".webp", cvImg, [cv2.IMWRITE_WEBP_QUALITY, self.quality])
+                img = cv2.imdecode(buf, 1)
+
+                Path(outputPath).mkdir(parents=True, exist_ok=True)
+
+                cv2.imwrite(outputPath + "/" + Path(filePath).stem + ".webp", img )
+                return True
+        except:
+            False
+
+    # TODO: this is deleting everything and idk why
     def syncDirs(self, thumb, file):
         thumb = os.path.normpath(thumb) + "/"
         file = os.path.normpath(file) + "/"
@@ -107,5 +135,7 @@ class watchDir:
                     relpath = os.path.dirname(i)
                     relpath = os.path.relpath(relpath, file)
                     if filetype.video_match(i):
-                        self.FrameCapture(i, thumb + relpath, self.quality)
+                        self.FrameCapture(i, thumb + relpath + "/video/", self.quality)
+                    elif filetype.audio_match(i):
+                        self.audioCoverCapture(i, thumb + relpath + "/audio/")
 

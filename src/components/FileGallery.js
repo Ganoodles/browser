@@ -48,7 +48,13 @@ const FileTree = (props)  => {
                                         <Image src={"/" + value.displayPath} className='object-cover rounded-md' width="100%" height="115px" layout="responsive" quality={thumbnailQuality} />
                                     </div>
                                     )
-                                }  else {
+                                } else if (value.type === "video") {
+                                    return (
+                                        <div className='pl-1 pr-1 pt-2'>
+                                            <Image src={value.thumbnail} className='object-cover rounded-md' width="100%" height="115px" layout="responsive" quality={thumbnailQuality} />
+                                        </div>
+                                    )
+                                } else {
                                     return (<div className='rounded-md'><img src={value.galleryIcon} className='w-full h-full'></img></div>)
                                 }
                             })()}

@@ -7,6 +7,7 @@ simpleIconDict = dict([
     ('image', '')
 ])
 
+# TODO: somehow need to handle files with same name as folder
 def clusterJson(config):
     path = config["path"]
     res = []
@@ -27,12 +28,12 @@ def clusterJson(config):
 
             # TODO: screw this I need to do my own file matching
             # TODO: maybe find a better way to do this, switch case?
-            # TODO: return thumbnail path
             if filetype.image_match(f):
                 fType = "image"
                 simpleIcon = "/svgs/image.svg"
                 galleryIcon = "/svgs/gallery/image.svg"
             elif filetype.video_match(f):
+                fThumbnail = "/thumbnails/video/" + pathlib.Path(f).stem + ".webp"
                 fType = "video"
                 simpleIcon = "/svgs/video.svg"
                 galleryIcon = "/svgs/gallery/video.svg"
