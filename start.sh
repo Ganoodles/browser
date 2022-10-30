@@ -1,0 +1,1 @@
+parallel -u ::: 'npm run dev' 'python3.11 -m uvicorn backend.main:app' 
