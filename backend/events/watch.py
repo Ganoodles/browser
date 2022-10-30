@@ -48,7 +48,7 @@ class Handler(FileSystemEventHandler):
                 pass
 
 class WatchDir:
-    """Watches specified directory for file changes, and saves a matching thumbnail if needed, also checks on for missing thumbnails start."""
+    """Watches specified directory for file changes, and saves a matching thumbnail if needed, also checks on start for missing thumbnails."""
     def __init__(self, thumbDir: str, fileDir: str, imageQuality: int = 100):
         self.thumbDir, self.fileDir, self.imageQuality = thumbDir, fileDir, imageQuality
         
