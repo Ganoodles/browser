@@ -1,141 +1,193 @@
+import cv2, io, time, shutil, filetype, warnings, mimetypes
+
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
-import time
-import os
+
 from pathlib import Path
-import glob
-import shutil
-import os
-from pathlib import Path
-import filetype
-from tinytag import TinyTag
+
 import numpy as np
-import cv2
-import base64
-import io
 import audio_metadata
 from PIL import Image
 
-# TODO: handle filetypes other than videos, exe, audio
-# TODO: create function to make thumbnail base folders
+#TODO: handle executables and other thumbnail types
+
+warnings.filterwarnings("ignore", message="Ignoring ``TDRC`` frame with value") # ignores redundant warnings
+warnings.filterwarnings("ignore", message="Ignoring ``TDOR`` frame with value")
 
 class Handler(FileSystemEventHandler):
-    @staticmethod
-    def on_any_event(event):
-        
-        thumbnailDirectory = watchDir.thumbnailDirectory
-        fileDir = watchDir.fileDir
-        
+    def __init__(self, inDir: Path, outDir: Path, inName: str, outName: str, imageQuality: int):
+        self.inDir: Path = inDir
+        self.outDir: Path = outDir
+        self.inName: str = inName
+        self.outName: str = outName
+        self.imageQuality: int = imageQuality
 
-        filename = Path(event.src_path).stem
-        relpath = os.path.relpath(os.path.dirname(event.src_path), fileDir)
-        dirLoc = thumbnailDirectory + relpath[1:] + "/" + filename
-        thumbLoc = dirLoc + ".webp"
+
+    def on_any_event(self, event):
+        """Watches for file event, and generates/removes thumbnail accordingly"""
+        eventPath: Path = Path(event.src_path)
+        thumPath: Path = Path(self.outDir).joinpath(Path(str(DirUtils.getSubPath(eventPath, self.inName)) + ".webp"))
+        thumDirPath: Path = Path(str(thumPath.with_suffix('')))
 
         if event.event_type == 'created' or event.event_type == 'modified':
-            if filetype.video_match(event.src_path):
-                watchDir.FrameCapture(event.src_path, thumbnailDirectory + relpath + "/video/", 15)
-        elif event.event_type == 'deleted':
-            if(os.path.isfile(thumbLoc)):
-                os.remove(thumbLoc) 
-            elif os.path.isdir(dirLoc):
-                shutil.rmtree(os.path.dirname(dirLoc) + "/" + filename)
+            Path(thumPath).parent.mkdir(parents=True, exist_ok=True) # generates parent folders if missing
+            
+            if FileUtils.mimeTypeCheck(eventPath, "video"):
+                img: np.ndarray = FileUtils.frameCapture(str(eventPath), self.imageQuality)
+                if not img is None:
+                    cv2.imwrite(str(thumPath), img) 
 
-
-class watchDir:
-    def __init__(self, thumbnailDirectory, fileDir, quality):
-        self.thumbnailDirectory = thumbnailDirectory
-        self.fileDir = fileDir
-        self.quality = quality
+            elif FileUtils.mimeTypeCheck(eventPath, "audio"):
+                img: np.ndarray = FileUtils.grabCoverArt(str(eventPath), self.imageQuality)
+                if not img is None:
+                    cv2.imwrite(str(thumPath), img) 
         
-        self.observer = Observer()
-        self.syncDirs(self.thumbnailDirectory, self.fileDir)
+        if event.event_type == 'deleted':
+            try:
+                if thumPath.is_file():
+                    thumPath.unlink(missing_ok=True)
+                elif thumDirPath.is_dir():
+                    shutil.rmtree(str(thumDirPath)) # TODO: maybe try doing this without destructive force
+            except:
+                pass
+
+class WatchDir:
+    """Watches specified directory for file changes, and saves a matching thumbnail if needed, also checks on for missing thumbnails start."""
+    def __init__(self, thumbDir: str, fileDir: str, imageQuality: int = 100):
+        self.thumbDir, self.fileDir, self.imageQuality = thumbDir, fileDir, imageQuality
+        
+        self.observer: Observer = Observer() # defines observer that watches for file changes and updates thumbnails
+        DirUtils.syncDirs(self.fileDir, self.thumbDir, "files", "thumbnails", self.imageQuality) # checks on start for missing or hanging thumbnails, and handles them accordingly
+        self.run()
+
 
     def run(self):
-        event_handler = Handler()
+        event_handler: Handler = Handler(self.fileDir, self.thumbDir, "files",  "thumbnails", self.imageQuality) # put files and thumbnails in variables 
         self.observer.schedule(event_handler, self.fileDir, recursive = True)
         self.observer.start()
-        try:
+        try: # waits for keyboard interrupt and stops if detects one
             while True:
                 time.sleep(1)
         except KeyboardInterrupt:
             self.observer.stop()
         self.observer.join()
 
-    def FrameCapture(self, filePath, outputPath, scalePercent = None):
-        if filetype.video_match(filePath):
-            filename = Path(filePath).stem
-            vid = cv2.VideoCapture(filePath)
-            success, image = vid.read()
-            Path(outputPath).mkdir(parents=True, exist_ok=True)
-            _, buf = cv2.imencode(".webp", image, [cv2.IMWRITE_WEBP_QUALITY, self.quality])
-            img = cv2.imdecode(buf, 1)
-            cv2.imwrite(os.path.join(outputPath, (filename + ".webp")), img)
-            return True
-        else: 
-            return False
+
+class DirUtils:
+    @staticmethod
+    def syncDirs(inPath: str, outputPath: str, inName: str, outName: str, imageQuality: int) -> bool:
+        """Compares directory files once, deletes old thumbnails, makes missing ones, used on initialization."""
+        # contains list of relative paths for every file in directory exclusing parent folder name
+        inList: set[Path] = set([Path(DirUtils.getSubPath(f, inName)) for f in Path(inPath).rglob('*')])
+        outList: set[Path] = set([Path(DirUtils.getSubPath(f, outName)).with_suffix('') for f in Path(outputPath).rglob('*')])
+        
+        inDif: set[Path] = inList.difference(outList)
+        outDif: set[Path] = outList.difference(inList)
+        
+        folders: list[Path] = [] # contains all folders left over afted deleting files
+        for file in outDif: # deletes old thumbnails
+            file = Path(outputPath).joinpath(file)
+            
+            thum = Path(str(file) + ".webp") # TODO: maybe add suffix somehow instead of string manipulation
+            
+            if thum.is_file():
+                try:
+                    thum.unlink(missing_ok=True)
+                except:
+                    pass
+                
+            elif file.is_dir():
+                folders.append(file)
+
+        for dir in folders: # delete empty hanging folders
+            dir.rmdir()
+        
+        # generates missing thumbnails and folders
+        for file in inDif:
+            outLocation: Path = Path(outputPath).joinpath(str(file) + '.webp')
+            file: Path = Path(inPath).joinpath(file) 
+            
+            Path(outLocation).parent.mkdir(parents=True, exist_ok=True) # generates parent folders if missing
+            if FileUtils.mimeTypeCheck(file, "video"):
+                img: np.ndarray = FileUtils.frameCapture(str(file), imageQuality)
+                cv2.imwrite(str(outLocation), img) 
+
+            elif FileUtils.mimeTypeCheck(file, "audio"):
+                img: np.ndarray = FileUtils.grabCoverArt(str(file), imageQuality)
+                if not img is None:
+                    cv2.imwrite(str(outLocation), img) 
 
 
-    def audioCoverCapture(self, filePath, outputPath):
+    @staticmethod
+    def splitAll(path: str) -> list:
+        """ 
+        Returns a path split into list by directories/file. 
+        E.g "dir1/dir2/test.png" returns list "["dir1", "dir2, "test.png"]"
+        """
+        allParts: list[str] = []
+        while 1:
+            parts: tuple(str) = (str(Path(path).parent), str(Path(path).name))
+            if parts[0] == path:
+                allParts.insert(0, parts[0])
+                break
+            elif parts[1] == path:
+                allParts.insert(0, parts[1])
+                break
+            else:
+                path = parts[0]
+                allParts.insert(0, parts[1])
+                
+        return allParts
+
+    @staticmethod
+    def getSubPath(originalPath: str, initialName: str) -> str:
+        """Returns sub path of specified directory in first instance (can run again if repeated), Accepts absolute and relative paths."""
+        pathArr: list[str] = DirUtils.splitAll(originalPath)
+        itemIdx: int = pathArr.index(initialName)
+        reversedArr: list[str] = pathArr[itemIdx + 1:] # stores everything after itemIdx
+        return Path("/".join(reversedArr))
+
+class FileUtils:
+    @staticmethod
+    def mimeTypeCheck(filePath: str, type: str) -> bool:
+        """Compares a files mimetype to see if it matches the check"""
+        return str(mimetypes.guess_type(filePath)[0]).find(type) != -1
+
+    @staticmethod
+    def grabCoverArt(filePath: str, imageQuality: int = 100) -> np.ndarray:
+        """Gets the cover art of audio file from metadata, optionally downscales it with argument "imageQuality", and returns cv2 numpy array encoded for webp"""
         try:
             meta = audio_metadata.load(filePath)
             cover = meta.pictures[0].data
             if cover:
                 stream = io.BytesIO(cover)
-                pilImg = Image.open(stream)
-                cvImg = np.array(pilImg) 
-                cvImg = cvImg[:, :, ::-1].copy() 
+                pilImg = Image.open(stream) # TODO: maybe find a way to do this without pillow cv2.imread(path, 0) 
+                cvImg = cv2.cvtColor(np.array(pilImg), cv2.COLOR_RGB2BGR) # Converts to numpy arr and converts RGB TO BGR
 
-                _, buf = cv2.imencode(".webp", cvImg, [cv2.IMWRITE_WEBP_QUALITY, self.quality])
+                _, buf = cv2.imencode(".webp", cvImg, [cv2.IMWRITE_WEBP_QUALITY, imageQuality])
                 img = cv2.imdecode(buf, 1)
-
-                Path(outputPath).mkdir(parents=True, exist_ok=True)
-
-                cv2.imwrite(outputPath + "/" + Path(filePath).stem + ".webp", img )
-                return True
-        except:
-            False
-
-    # TODO: this is deleting everything and idk why
-    def syncDirs(self, thumb, file):
-        thumb = os.path.normpath(thumb) + "/"
-        file = os.path.normpath(file) + "/"
-
-        fileLen, thumbLen = len(file)-1, len(thumb)-1
-
-        # collect all files in thumb dir and file dir and remove parent dir for comparison
-        sRPath1 = []
-        rPath1 = [f for f in glob.glob(thumb + "**/*", recursive=True)]
-        for value in rPath1:
-            sRPath1.append ((os.path.dirname(value) + Path(value).stem)[thumbLen:])
-
-        sRPath2 = []
-        rPath2 = [f for f in glob.glob(file + "**/*", recursive=True)]
-        for value in rPath2:
-            sRPath2.append ((os.path.dirname(value) + Path(value).stem)[fileLen:])
-
-        lFolders = []
-        for i in rPath1:
-            item = (os.path.dirname(i) + Path(i).stem)[thumbLen:]
-            if item not in sRPath2:
-                if(os.path.isfile(i)):
-                    os.remove(i)
-                else:
-                    lFolders.append(i)
-            else:
-                pass
-        if(lFolders):
-            for i in lFolders:
-                shutil.rmtree(i)
-
-        for i in rPath2:
-            if(os.path.isfile(i)):
-                item = (os.path.dirname(i) + Path(i).stem)[fileLen:]
-                if item not in sRPath1:
-                    relpath = os.path.dirname(i)
-                    relpath = os.path.relpath(relpath, file)
-                    if filetype.video_match(i):
-                        self.FrameCapture(i, thumb + relpath + "/video/", self.quality)
-                    elif filetype.audio_match(i):
-                        self.audioCoverCapture(i, thumb + relpath + "/audio/")
-
+                
+                return img
+        except Exception:
+            return None
+        
+    @staticmethod
+    def frameCapture(filePath: str, imageQuality: int = 100) -> np.ndarray: 
+        """Captures first frame of video, optionally downscales it with argument "imageQuality", and returns cv2 numpy array encoded for webp"""
+        try:
+            if FileUtils.mimeTypeCheck(filePath, "video"):
+                vid: cv2.VideoCapture = cv2.VideoCapture(filePath)
+                
+                success: bool
+                image: np.ndarray
+                success, image = vid.read()
+                
+                _: bool
+                buf: np.ndarray
+                _, buf = cv2.imencode(".webp", image, [cv2.IMWRITE_WEBP_QUALITY, imageQuality])
+                
+                image = cv2.imdecode(buf, 1)
+                
+                return image
+        except Exception:
+            return None

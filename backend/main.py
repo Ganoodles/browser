@@ -8,7 +8,7 @@ import os
 from multiprocessing import Process
 
 from .functions.cluster import clusterJson
-from .events.watch import watchDir 
+from .events.watch import WatchDir
 
 app = FastAPI()
 
@@ -32,7 +32,8 @@ app.add_middleware(
 thumbnailFolder = os.path.dirname(config["path"]) + "/thumbnails"
 
 # start thumbnail watchdog
-p = Process(target=watchDir, args=(thumbnailFolder, config["path"], 25))
+# DirUtils.syncDirs(thumbnailFolder, config["path"], "thumbnails", "files", 25)
+p = Process(target=WatchDir, args=(thumbnailFolder, config["path"], 25))
 p.daemon = True
 p.start()
 
