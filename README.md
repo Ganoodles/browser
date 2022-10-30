@@ -1,34 +1,79 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+#### THIS PROJECT IS A WIP, DO NOT TRY TO USE IT FOR PRODUCTION YET, SERIOUSLY!
+# What is this:
+**What:** This is a side project I'm working on that intends to be a self-hostable option to serve a specified folder index with a web interface. With features such as editing and viewing inside the browser, providing a direct link to files served through HTTP, (Maybe open API access too), and tons of other features. This project is oriented towards speed and being lighter than all other options currently available while still maintaining an impressive UI design and smooth feel. 
 
-## Getting Started
+**Why:** Simply because when I perusing for something similar to host on my own, I noticed a complete lack in features for what I was looking for in what is currently available, alongside that a massive lack in visually appealing ui. So this projects hopes to fill that gap.
 
-First, run the development server:
+**How**: Currently this project is using a Python [FastAPI](https://fastapi.tiangolo.com/) rest server as the backend, the frontend is built on [Next.JS](https://nextjs.org/) with [TypeScript](https://www.typescriptlang.org/) and [Tailwind CSS](https://tailwindcss.com/). 
 
-```bash
-npm run dev
-# or
-yarn dev
-```
+_Have an idea which you think would be cool and don't wanna implement it yourself?:_
+Contact me on discord: **_Ganoodles#4080_** 
+Or email me: __[contact@somedamndomain.lol](mailto:contact@somedamndomain.lol)__ (this is just a temporary email, will update later)
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+**Estimated Release Date?:** No clue
 
-You can start editing the page by modifying `pages/index.js`. The page auto-updates as you edit the file.
+**Similar Projects**
+- https://github.com/filebrowser/filebrowser
+- https://github.com/mickael-kerjean/filestash
+- https://github.com/misterunknown/ifm
+- https://github.com/silverwind/droppy (Archived)
+- https://github.com/lrsjng/h5ai
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.js`.
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+------
+# Quick how to use:
+ AGAIN, do not use this yet! Its still very early on in production! 
+### Prerequisites
+- [Install python](https://www.python.org/downloads/), minimum version: 3.11
+- Install python requirements:
+    ```shell
+    pip3 install -r requirements.txt
+    ```
 
-## Learn More
+- Install [node.js and npm](https://nodejs.org/en/download/)
+- Install node.js requirements: 
+    ``npm install``
 
-To learn more about Next.js, take a look at the following resources:
+### How to run:
+#### Start Automatically:
+Simply run, ``start.bat`` stop with ctrl+break, or incase of linux run ``sh start.sh`` _requires: [gnu-parallel](https://www.gnu.org/software/parallel/)_
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+#### Or Start Manually:
+- In one terminal instance run the following line to start the **FastAPI Python Rest Server**:
+    ```shell
+    uvicorn backend.main:app
+    ```
+- In another terminal instance run the following line to start the frontend **Next.JS** server:
+    ```shell
+    npm run start
+    ```
+    _Or if you're working on a fork/contributing, replace with the following:_ ``uvicorn backend.main:app --reload`` _and_ ``npm run dev``
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
 
-## Deploy on Vercel
+----
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### TODO:
+- [ ] Clean up frontend
+- [ ] Find better gallery icons
+- [ ] Add file path browser functional
+- [ ] Add file uploading
+  - [ ] Upload through url? (probably not)
+  - [ ] Add drag and drop support
+- [ ] Add folder uploading (maybe)
+- [ ] Add built in text editor
+  - [ ] Vim support?
+- [ ] Add optional password authentication
+- [ ] Add optional IP whitelist
+- [ ] Add video, audio, image viewing lightbox
+- [ ] Add file renaming
+- [ ] Create file properties button
+- [ ] Maybe file/folder permissions maybe
+- [ ] Add search
+- [ ] Mobile Version
+- [ ] Add customization
+- [ ] Full screen and simple view
+- [ ] Setup keybinds
+- [ ] Side by side windows?
+- [ ] Add option to download directories as zips
+- [ ] Setup docker image
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
