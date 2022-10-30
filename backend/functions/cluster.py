@@ -3,11 +3,10 @@ import filetype
 import pathlib
 from datetime import datetime
 
-simpleIconDict = dict([
-    ('image', '')
-])
+from ..utils import DirUtils, FileUtils
 
 # TODO: somehow need to handle files with same name as folder
+# TODO: also need to rewrite this and put in methods
 def clusterJson(config):
     path = config["path"]
     res = []
@@ -33,7 +32,7 @@ def clusterJson(config):
                 simpleIcon = "/svgs/image.svg"
                 galleryIcon = "/svgs/gallery/image.svg"
             elif filetype.video_match(f):
-                fThumbnail = "/thumbnails/video/" + pathlib.Path(f).stem + ".webp"
+                fThumbnail = "/thumbnails/" + pathlib.Path(f).name + ".webp"
                 fType = "video"
                 simpleIcon = "/svgs/video.svg"
                 galleryIcon = "/svgs/gallery/video.svg"
@@ -49,7 +48,7 @@ def clusterJson(config):
                 fType = "other"
                 simpleIcon = "/svgs/globe.svg"
                 galleryIcon = "/svgs/gallery/globe.svg"
-                
+
         else:
             fSize = format_bytes(get_dir_size(f))
             fType = "folder"
@@ -68,7 +67,6 @@ def clusterJson(config):
             "galleryIcon": galleryIcon,
             "thumbnail" : fThumbnail
         })
-
     return(res)
 
 def get_dir_size(dir_path:str) -> int:
