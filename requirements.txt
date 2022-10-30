@@ -1,0 +1,6 @@
+audio_metadata==0.11.1
+fastapi==0.85.1
+filetype==1.1.0
+opencv_python==4.6.0.66
+Pillow==9.3.0
+watchdog==2.1.9
