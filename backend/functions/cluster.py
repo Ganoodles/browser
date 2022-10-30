@@ -52,6 +52,7 @@ def clusterJson(config):
 
         else:
             simpleIcon = "/svgs/folder.svg"
+            galleryIcon = "/svgs/gallery/folder.svg"
             fSize = format_bytes(get_dir_size(f))
             fType = "folder"
 
