@@ -112,7 +112,6 @@ class FileUtils:
                 
                 return img
         except Exception as e:
-            print(e)
             return None
         
     @staticmethod
@@ -133,5 +132,5 @@ class FileUtils:
                 image = cv2.imdecode(buf, 1)
                 
                 return image
-        except Exception:
+        except Exception as e:
             return None
