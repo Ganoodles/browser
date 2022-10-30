@@ -88,6 +88,18 @@ class FileUtils:
     def mimeTypeCheck(filePath: str, type: str) -> bool:
         """Compares a files mimetype to see if it matches the check"""
         return str(mimetypes.guess_type(filePath)[0]).find(type) != -1
+    def mimeTypeCheck(filePath: str, type: str = None) -> str:
+        """
+        Compares a files mimetype to see if it matches the check, optionally don't include type to return file type from premade type list
+        Possible outputs: ["video", "audio", "application", "font", "image", "model", "text"]
+        """
+        options = ["video", "audio", "application", "font", "image", "model", "text"]
+        if not type:
+            for itm in options:
+                if str(mimetypes.guess_type(filePath)[0]).startswith(itm):
+                    return itm
+        else:
+            return str(mimetypes.guess_type(filePath)[0]).startswith(type)
 
     @staticmethod
     def grabCoverArt(filePath: str, imageQuality: int = 100) -> np.ndarray:
