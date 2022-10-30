@@ -1,10 +1,9 @@
-import cv2, io, warnings, mimetypes
+import cv2, warnings, mimetypes
 
 from pathlib import Path
 
 import numpy as np
 import audio_metadata
-from PIL import Image
 
 warnings.filterwarnings("ignore", message="Ignoring ``TDRC`` frame with value") # ignores redundant warnings
 warnings.filterwarnings("ignore", message="Ignoring ``TDOR`` frame with value")
@@ -85,9 +84,6 @@ class DirUtils:
 
 class FileUtils:
     @staticmethod
-    def mimeTypeCheck(filePath: str, type: str) -> bool:
-        """Compares a files mimetype to see if it matches the check"""
-        return str(mimetypes.guess_type(filePath)[0]).find(type) != -1
     def mimeTypeCheck(filePath: str, type: str = None) -> str:
         """
         Compares a files mimetype to see if it matches the check, optionally don't include type to return file type from premade type list
@@ -108,15 +104,15 @@ class FileUtils:
             meta = audio_metadata.load(filePath)
             cover = meta.pictures[0].data
             if cover:
-                stream = io.BytesIO(cover)
-                pilImg = Image.open(stream) # TODO: maybe find a way to do this without pillow cv2.imread(path, 0) 
-                cvImg = cv2.cvtColor(np.array(pilImg), cv2.COLOR_RGB2BGR) # Converts to numpy arr and converts RGB TO BGR
+                npImg = np.fromstring(cover, np.uint8)
+                npImg = cv2.imdecode(npImg, cv2.IMREAD_COLOR)
 
-                _, buf = cv2.imencode(".webp", cvImg, [cv2.IMWRITE_WEBP_QUALITY, imageQuality])
+                _, buf = cv2.imencode(".webp", npImg, [cv2.IMWRITE_WEBP_QUALITY, imageQuality])
                 img = cv2.imdecode(buf, 1)
                 
                 return img
-        except Exception:
+        except Exception as e:
+            print(e)
             return None
         
     @staticmethod
