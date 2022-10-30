@@ -20,10 +20,11 @@ def clusterJson(config):
         fDisplayPath = "files/" + os.path.relpath(f, path) # would need to remove if wanted to serve other paths
         fModified = datetime.fromtimestamp(stat.st_mtime).strftime('%m/%d/%Y')
         fCreation = datetime.fromtimestamp(stat.st_ctime).strftime('%m/%d/%Y')
+        simpleIcon, galleryIcon = None, None
+        
         if os.path.isfile(f):
             fExtension = pathlib.Path(filename).suffix
             fSize = format_bytes(stat.st_size)
-            simpleIcon, galleryIcon = None, None
 
             # TODO: screw this I need to do my own file matching
             # TODO: maybe find a better way to do this, switch case?
@@ -50,6 +51,7 @@ def clusterJson(config):
                 galleryIcon = "/svgs/gallery/globe.svg"
 
         else:
+            simpleIcon = "/svgs/folder.svg"
             fSize = format_bytes(get_dir_size(f))
             fType = "folder"
 
