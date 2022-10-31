@@ -51,7 +51,7 @@ const FileTree = (props)  => {
                                 } else if (value.type === "video" && value.thumbnail || value.type === "audio" && value.thumbnail) {
                                     return (
                                         <div className='pl-1 pr-1 pt-2'>
-                                            <Image src={value.thumbnail} className='object-cover rounded-md' width="100%" height="110px" layout="responsive" quality={thumbnailQuality} />
+                                            <Image src={"/" + value.thumbnail} className='object-cover rounded-md' width="100%" height="110px" layout="responsive" quality={thumbnailQuality} />
                                         </div>
                                     )
                                 } else {

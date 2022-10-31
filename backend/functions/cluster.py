@@ -19,7 +19,7 @@ def clusterJson(config):
         f = os.path.join(path, filename)
 
         stat = os.stat(f)
-        fRelativePath = os.path.relpath(f)
+        fRelativePath = "files/" + str(DirUtils.getSubPath(os.path.relpath(f), "files")) 
         fDisplayPath = "files/" + os.path.relpath(f, path) # would need to remove if wanted to serve other paths
         fModified = datetime.fromtimestamp(stat.st_mtime).strftime('%m/%d/%Y')
         fCreation = datetime.fromtimestamp(stat.st_ctime).strftime('%m/%d/%Y')
@@ -31,7 +31,7 @@ def clusterJson(config):
             
             thumbLoc: Path = Path(path).parent.joinpath("thumbnails").joinpath(Path(str(DirUtils.getSubPath(f, "files")) + ".webp"))
             if thumbLoc.is_file():
-                fThumbnail = "/thumbnails/" + pathlib.Path(f).name + ".webp"
+                fThumbnail = "thumbnails/" + str(DirUtils.getSubPath(thumbLoc, "thumbnails"))
             
             # TODO: screw this I need to do my own file matching
             # TODO: maybe find a better way to do this, switch case?
