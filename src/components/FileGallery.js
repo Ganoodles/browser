@@ -40,7 +40,7 @@ const FileTree = (props)  => {
                 {/* TODO: Find a way to not repeat the same function maybe? If possible, maybe make own component  */}
                 {data.response.map(function(value) { return (
                     <a href={"/" + value.relativePath} className=" hover:bg-themeColor-900 p-2 max-h-[250px] overflow-hidden rounded-md active:bg-themeColor-400">
-                        <div className='max-w-[140px] '>
+                        <div className='max-w-[140px] m-auto'>
                             {(() => {
                                 if (value.type === "image") {
                                     return (
@@ -48,14 +48,14 @@ const FileTree = (props)  => {
                                         <Image src={"/" + value.displayPath} className='object-cover rounded-md' width="100%" height="115px" layout="responsive" quality={thumbnailQuality} />
                                     </div>
                                     )
-                                } else if (value.type === "video") {
+                                } else if (value.type === "video" && value.thumbnail || value.type === "audio" && value.thumbnail) {
                                     return (
                                         <div className='pl-1 pr-1 pt-2'>
-                                            <Image src={value.thumbnail} className='object-cover rounded-md' width="100%" height="115px" layout="responsive" quality={thumbnailQuality} />
+                                            <Image src={value.thumbnail} className='object-cover rounded-md' width="100%" height="110px" layout="responsive" quality={thumbnailQuality} />
                                         </div>
                                     )
                                 } else {
-                                    return (<div className='rounded-md'><img src={value.galleryIcon} className='w-full h-full'></img></div>)
+                                    return (<div className='rounded-md'><Image src={value.galleryIcon} className='object-cover rounded-md' width="100%" height="100px" layout="responsive" quality={thumbnailQuality} /></div>)
                                 }
                             })()}
                             <div className='text-center w-full p-1 text-sm break-words'>{value.name}</div>

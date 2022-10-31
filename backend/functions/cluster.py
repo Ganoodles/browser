@@ -1,7 +1,10 @@
+from genericpath import isfile
 import os
 import filetype
 import pathlib
+
 from datetime import datetime
+from pathlib import Path
 
 from ..utils import DirUtils, FileUtils
 
@@ -25,7 +28,11 @@ def clusterJson(config):
         if os.path.isfile(f):
             fExtension = pathlib.Path(filename).suffix
             fSize = format_bytes(stat.st_size)
-
+            
+            thumbLoc: Path = Path(path).parent.joinpath("thumbnails").joinpath(Path(str(DirUtils.getSubPath(f, "files")) + ".webp"))
+            if thumbLoc.is_file():
+                fThumbnail = "/thumbnails/" + pathlib.Path(f).name + ".webp"
+            
             # TODO: screw this I need to do my own file matching
             # TODO: maybe find a better way to do this, switch case?
             if filetype.image_match(f):
@@ -33,7 +40,6 @@ def clusterJson(config):
                 simpleIcon = "/svgs/image.svg"
                 galleryIcon = "/svgs/gallery/image.svg"
             elif filetype.video_match(f):
-                fThumbnail = "/thumbnails/" + pathlib.Path(f).name + ".webp"
                 fType = "video"
                 simpleIcon = "/svgs/video.svg"
                 galleryIcon = "/svgs/gallery/video.svg"
