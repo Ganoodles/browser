@@ -26,6 +26,8 @@ p = Process(target=WatchDir, args=(thumbnailFolder, config["path"], 25))
 p.daemon = True
 p.start()
 
+# TODO: allow to specify directory to search
+
 @app.get("/api")
 async def read_root():
     # success thing
