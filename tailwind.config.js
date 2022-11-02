@@ -13,26 +13,25 @@ module.exports = {
       transparent: 'transparent',
       current: 'currentColor',
       'white': '#ffffff',
+      'almostWhite': '#CCCCCC', 
       'button': {
         500: "#7e91c3"
       },
-      'themeColor' : {
-        300: "#3C4251",
-        400: "#656871",
-        450: "#3b3e46",
-        500: "#26272e",
-        600: "#212125",
-        700: "#26262B",
-        800: "#1e1e22",
-        900: '#18181B',
-        1000: '#101012'
-      },
-      'textColor' : {
-        500: '#979797',
-        600: '#7c8abd',
-      },
       'itemIdentifier': {
         image: '#413ED3',
+      },
+      'bColor': {
+        'softer': '#1e1e23',
+        'soft': '#2B2B2F',
+        'hard-blue': '#45435B',
+      },
+      'bgColor': {
+        'soft': '#19191f',
+        'medium-blue': '#191920',
+        'hard': '#15151a',
+        'basicallyBlack': '#131314',
+        'bluishGrey': '#1d1d25',
+        'lighterBluishGrey': '#252537',
       }
     },
     extend: {},

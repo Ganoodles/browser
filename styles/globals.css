@@ -2,35 +2,22 @@
 @tailwind components;
 @tailwind utilities;
 
-@font-face {
-    font-family: "Inter";
-    src: url('../public/fonts/Inter/static/Inter-Regular.ttf')
-}
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap');
 
 @layer base {
     body {
-        @apply text-white  p-4 bg-themeColor-900 
+        font-family: 'Inter', sans-serif;
+        transition: all 200ms;
+        @apply text-white  bg-bgColor-hard 
     }
 }
 
 * {
-    max-zoom: 1.2 !important;
+    scrollbar-color: rgb(93, 92, 102) #19191f;
 }
 
 .grid-alignment {
     display: grid;
     grid-gap: 5px;
     grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-
 }
-
-.tbodySelector > tr:last-child> a:nth-child(1) > span:nth-child(1) {
-    border-bottom-left-radius: 16px;
-    border-bottom-right-radius: 16px;
-}
-
-.tbodySelector > tr:last-child > span:nth-child(1) {
-    border-bottom-left-radius: 16px;
-    border-bottom-right-radius: 16px;
-}
-

@@ -56,6 +56,8 @@ Simply run, ``start.bat`` stop with ctrl+break, or incase of linux run ``sh star
 
 ### TODO:
 - [ ] Clean up frontend
+- [ ] Make resizable file tree
+- [ ] Add file tree
 - [ ] Find better gallery icons
 - [ ] Add file path browser functional
 - [ ] Add file uploading

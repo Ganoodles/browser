@@ -1,0 +1,67 @@
+.gridCon {
+    color: grey;
+
+    display: grid;
+    height: 100vh;
+    grid-template-columns: 30rem 5fr;
+    grid-template-rows: 4rem 2.5rem 6fr;
+    grid-template-areas: 
+        "navbar navbar"
+        "treeLabel tabBar"
+        "sidebar mainArea";
+}
+
+.navbar { grid-area: navbar; }
+.treeLabel { grid-area: treeLabel; }
+.tabBar { grid-area: tabBar; }
+.sidebar { grid-area: sidebar; }
+.mainArea { grid-area: mainArea;}
+
+.navIcon {
+    --border-color: #524e6d;
+    
+    filter: 
+        invert(40%)
+        sepia(100%)
+        hue-rotate(190deg)
+}
+
+.tabBar div:hover .navIcon {
+    filter:
+        invert(60%)
+        sepia(100%)
+        hue-rotate(190deg)
+}
+
+.fileGrid {
+    display: grid;
+    grid-template-rows: auto 1fr;
+}
+@media only screen and (max-width: 1200px) {
+    .gridCon {
+        grid-template-columns: 1fr;
+        grid-template-rows: 100vh;
+        grid-template-areas:
+            "mainArea"
+    }
+    .fileNav {
+        left: 0;
+        grid-area: fileNav;
+    }
+    .treeLabel {
+        display: none;
+    }
+
+    .tabBar {
+        display: none;
+    }
+
+    .sidebar {
+        display: none;
+    }
+
+    .file-path {
+        display: none;
+    }
+    
+}

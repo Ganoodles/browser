@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import useSWR from 'swr/immutable'; 
 
-import FileTree from '../../components/FileTree';
+import FileTree from '../../components/FileList';
 import FileGallery from '../../components/FileGallery';
 
 export default function HomeDirList() {
